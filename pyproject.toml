@@ -1,0 +1,18 @@
+[project]
+name = "python-practice"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Amir-zeb", email = "amirzeb695@gmail.com" }
+]
+requires-python = ">=3.14"
+dependencies = []
+
+[tool.uv]
+package = false
+
+[dependency-groups]
+dev = [
+    "mypy>=2.3.0",
+]

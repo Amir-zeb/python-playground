@@ -1,3 +1,4 @@
+from typing import Union
 
 MAIN_MENU={
     "w":"Withdraw cash",
@@ -6,8 +7,8 @@ MAIN_MENU={
     "c":"Cancel",
 }
 
-# TRANSACTION_HISTORY DATA
-TRANSACTION_HISTORY=[]
+class InsufficientFundsError(Exception):
+    pass
 
 class User:
     def __init__(self, user_id: int, username: str, pin: str, fname: str, lname: str):
@@ -28,12 +29,19 @@ class Account:
         self.owner = owner
         self.balance = balance
         
-    # only withdraw
     def withdraw(self, amount: float) -> None:
-        pass
+        if amount <= 0:
+            raise ValueError("Withdrawal amount must be positive")
+        if amount > self.balance:
+            raise InsufficientFundsError(
+                f"Cannot withdraw {amount}, balance is only {self.balance}"
+            )
+        self.balance -= amount
+        print(f"Withdraw successful.")
+        # how to create transaction history
     
-    def balance_inquiry(self) -> None:
-        pass
+    def balance_inquiry(self,cs:str) -> None:
+        print(f"Balance={cs}{self.balance}")
     
     def __str__(self):
         return f"Account({self.account_id}, {self.owner}, {self.balance})"
@@ -42,7 +50,8 @@ class Account:
 # account class ends
 
 class Bank:
-    bank_name="WORK BANK"
+    BANK_NAME:str="WORK BANK"
+    CURRENCY_SYMBOL:str='RS'
     
     def __init__(self):
         self.users: list[User] = []
@@ -54,13 +63,13 @@ class Bank:
     def add_account(self, account: Account) -> None:
         self.accounts.append(account)
     
-    def find_user(self, username: str, pin: str):
+    def find_user(self, username: str, pin: str)->Union[User,None]:
         for u in self.users:
             if u.username == username and u.pin == pin:
                 return u
         return None
     
-    def find_account_for_user(self, user: User):
+    def find_account_for_user(self, user: User)->Union[Account,None]:
         for acc in self.accounts:
             if acc.owner.user_id == user.user_id:
                 return acc
@@ -115,7 +124,7 @@ def main()->None:
     bank.add_account(Account(2,user2,50))
 
     while True:
-        print(F"\nWELCOME TO {bank.bank_name}")
+        print(F"\nWELCOME TO {bank.BANK_NAME}")
         print("__ATM_SIMULATOR__\n")
         # get user credentials
         user_name=input("Username :").strip().lower()
@@ -129,9 +138,8 @@ def main()->None:
             # login user
             user=user_auth.login_user(bank.users)
             account=bank.find_account_for_user(user)
-            print("🚀 ~ main ~ account:", account)
             
-            if user:
+            if user and account:
                 while True:
                     # print main menu
                     print("\nMAIN MENU")
@@ -140,17 +148,20 @@ def main()->None:
                     menu_opt=input("Enter menu option :").strip().lower()
                     match menu_opt:
                         case 'w':
-                            print("withdraw money will be implemented soon.")
+                            amt=float(input("Enter amount to withdraw :").strip().lower())
+                            account.withdraw(amt)
                         case 'i':
-                            print("balance inquiry will be implemented soon.")
+                            account.balance_inquiry(bank.CURRENCY_SYMBOL)
                         case 't':
                             print("transaction history will be implemented soon.")
                         case 'c':
-                            print("Thankyou for using our services.")
+                            print("\nThankyou for using our services.")
                             print("__________*********_________\n")
                             break
                         case _:
                             print("Menu option not available.")
+            else:
+                print("Unable to get user or account.")
 
 if __name__ == "__main__":
     main()

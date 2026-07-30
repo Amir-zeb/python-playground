@@ -1,6 +1,7 @@
 from typing import Union
+from datetime import datetime
 
-MAIN_MENU={
+MAIN_MENU:dict[str,str]={
     "w":"Withdraw cash",
     "i":"Balance Inquiry",
     "t":"Transaction history",
@@ -23,13 +24,28 @@ class User:
     __repr__=__str__
 # user class ends
 
+class Transaction:
+    def __init__(self, account: "Account", tx_type: str, amount: float, balance_after: float):
+        self.account = account
+        self.tx_type = tx_type
+        self.amount = amount
+        self.balance_after = balance_after
+        self.timestamp = datetime.now()
+    
+    def __str__(self):
+        return (f"[{self.timestamp:%Y-%m-%d %H:%M:%S}] "
+                f"{self.account.owner.username} — {self.tx_type} {self.amount} "
+                f"→ balance {self.balance_after}")
+    
+    __repr__ = __str__
+
 class Account:
     def __init__(self, account_id: int, owner: User, balance: float):
         self.account_id = account_id
         self.owner = owner
         self.balance = balance
         
-    def withdraw(self, amount: float) -> None:
+    def withdraw(self, amount: float) -> Transaction:
         if amount <= 0:
             raise ValueError("Withdrawal amount must be positive")
         if amount > self.balance:
@@ -38,7 +54,9 @@ class Account:
             )
         self.balance -= amount
         print(f"Withdraw successful.")
-        # how to create transaction history
+        # record transaction
+        return Transaction(self, "withdraw", amount, self.balance)
+
     
     def balance_inquiry(self,cs:str) -> None:
         print(f"Balance={cs}{self.balance}")
@@ -56,6 +74,7 @@ class Bank:
     def __init__(self):
         self.users: list[User] = []
         self.accounts: list[Account] = []
+        self.transaction: list[Transaction] = []
         
     def add_user(self, user: User) -> None:
         self.users.append(user)
@@ -74,6 +93,12 @@ class Bank:
             if acc.owner.user_id == user.user_id:
                 return acc
         return None
+    
+    def record_transaction(self,tx:Transaction)->None:
+        self.transaction.append(tx)
+    
+    def transactions_for_account(self,account:"Account")->list[Transaction]:
+        return [tx for tx in self.transaction if tx.account.account_id==account.account_id]
 # bank class ends
 
 class Auth:
@@ -148,12 +173,17 @@ def main()->None:
                     menu_opt=input("Enter menu option :").strip().lower()
                     match menu_opt:
                         case 'w':
-                            amt=float(input("Enter amount to withdraw :").strip().lower())
-                            account.withdraw(amt)
+                            try:
+                                amt=float(input("Enter amount to withdraw :").strip().lower())
+                                tx=account.withdraw(amt)
+                                bank.record_transaction(tx)
+                            except (ValueError, InsufficientFundsError) as e:
+                                print(f"Transaction failed: {e}")
                         case 'i':
                             account.balance_inquiry(bank.CURRENCY_SYMBOL)
                         case 't':
-                            print("transaction history will be implemented soon.")
+                            tx_list=bank.transactions_for_account(account)
+                            print(tx_list)
                         case 'c':
                             print("\nThankyou for using our services.")
                             print("__________*********_________\n")

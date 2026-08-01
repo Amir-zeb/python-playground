@@ -13,6 +13,8 @@ a specific set of concepts.
 | [rock-paper-scissors](./rock-paper-scissors) | functions, dictionaries, exception handling, loops, strict typing (Literal, tuple, dict generics) |
 | [heads-or-tails](./heads-or-tails) | functions, dictionaries, exception handling, binary comparison logic, strict typing |
 | [atm-simulator](./atm-simulator) | OOP (classes, encapsulation, object references), custom exceptions, `match` statements, forward references, multi-class design (User, Account, Transaction, Bank, Auth) |
+| [api-calls](./api-calls) | async/await, `httpx` sync vs async requests, `asyncio.gather`, mocking HTTP calls in tests |
+| [personal-assistant](./personal-assistant) | speech recognition, text-to-speech, local LLM integration (Ollama via `httpx`), conversation state, third-party library type-stub limitations |
 
 More exercises will be added as I work through core Python and into
 FastAPI fundamentals.
@@ -97,3 +99,61 @@ uv run python atm-simulator/atm_simulator.py
 Log in with one of the seeded users (`amir`/`1122` or `ali`/`4455`),
 then use the menu to check balance, withdraw cash, or view
 transaction history.
+
+---
+
+## api-calls
+
+A comparison of synchronous vs. concurrent API calls, fetching live
+cryptocurrency prices from the CoinGecko public API.
+
+### What this practices
+- `async`/`await` syntax and semantics — the difference between
+  non-blocking (single sequential `await`) and truly concurrent
+  (`asyncio.gather`) execution
+- Real I/O-bound waiting vs. CPU-bound work, and why async only
+  helps the former
+- `httpx` for both sync (`httpx.get`) and async
+  (`httpx.AsyncClient`) HTTP requests
+- Testing async code with `pytest-asyncio`, and mocking HTTP calls
+  with test doubles instead of hitting a real API in tests
+
+### Run it
+\`\`\`bash
+uv run python api-calls/api_calls.py
+\`\`\`
+
+Prints elapsed time for fetching 5 coin prices sequentially vs.
+concurrently, showing the real-world speedup from overlapping
+network waits.
+
+---
+
+## personal-assistant
+
+A wake-word-activated voice assistant: listens for a trigger word,
+executes simple commands (opening websites), and falls back to a
+local Ollama LLM for open conversation, with speech-to-text and
+text-to-speech.
+
+### What this practices
+- Integrating multiple third-party libraries (`speech_recognition`,
+  `pyttsx3`) around a core loop
+- Reusing the async/`httpx` knowledge from api-calls to call a local
+  LLM API (Ollama) for conversation
+- Command routing via dictionary lookup (same pattern as earlier
+  games) instead of long `if/elif` chains
+- Maintaining conversation state across turns (message history sent
+  to the LLM)
+- Handling a real limitation of typed tooling: some third-party
+  libraries ship no type stubs, requiring targeted `mypy` config
+  overrides rather than code changes
+
+### Run it
+\`\`\`bash
+uv run python personal-assistant/personal_assistant.py
+\`\`\`
+
+Requires a local Ollama instance running with a pulled model. Say
+the wake word to activate, then speak a command or question; say the
+quit phrase to stop listening for commands.

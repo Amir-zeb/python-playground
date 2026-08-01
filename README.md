@@ -37,9 +37,9 @@ score tracking across rounds.
 - Strict typing with `Literal` and typed tuples/dicts, checked with `mypy`
 
 ### Run it
-\`\`\`bash
+```bash
 uv run python rock-paper-scissors/rock_paper_scissors.py
-\`\`\`
+```
 
 You'll be prompted to enter `r`, `p`, or `s` each round. Score is
 tracked and shown after every round; type `n` when asked to play
@@ -60,9 +60,9 @@ tracking across rounds.
 - Strict typing with `Literal` for both game outcomes and coin sides
 
 ### Run it
-\`\`\`bash
+```bash
 uv run python heads-or-tails/heads_or_tails.py
-\`\`\`
+```
 
 You'll be prompted to enter `h` or `t` each round. Score is tracked
 and shown after every round; type `n` when asked to play again to exit.
@@ -92,9 +92,9 @@ multi-class design instead of dictionaries.
   across all accounts rather than each account tracking its own history
 
 ### Run it
-\`\`\`bash
+```bash
 uv run python atm-simulator/atm_simulator.py
-\`\`\`
+```
 
 Log in with one of the seeded users (`amir`/`1122` or `ali`/`4455`),
 then use the menu to check balance, withdraw cash, or view
@@ -119,9 +119,9 @@ cryptocurrency prices from the CoinGecko public API.
   with test doubles instead of hitting a real API in tests
 
 ### Run it
-\`\`\`bash
+```bash
 uv run python api-calls/api_calls.py
-\`\`\`
+```
 
 Prints elapsed time for fetching 5 coin prices sequentially vs.
 concurrently, showing the real-world speedup from overlapping
@@ -150,9 +150,9 @@ text-to-speech.
   overrides rather than code changes
 
 ### Run it
-\`\`\`bash
+```bash
 uv run python personal-assistant/personal_assistant.py
-\`\`\`
+```
 
 Requires a local Ollama instance running with a pulled model. Say
 the wake word to activate, then speak a command or question; say the
